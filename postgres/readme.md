@@ -1,9 +1,21 @@
+## Network
+We need to create a network for connect postgres with pgadmin. If you dont want it, skip this step
+
+``` bash
+docker network create -d bridge postgres-net
+```
 ## Running PostgreSQL and pgAdmin with Docker
 To run PostgreSQL using Docker, execute the following command:
 
 ```bash
-docker run --name postgres-db -e POSTGRES_PASSWORD=your_password -e POSTGRES_USER=your_username -e POSTGRES_DB=your_database_name -p 5432:5432 -d postgres:latest
+docker run --name postgres-db  --network=postgres-net -e POSTGRES_PASSWORD=your_password -e POSTGRES_USER=your_username -e POSTGRES_DB=your_database_name -p 5432:5432 -d postgres:latest 
 ```
+or (deleting after stop)
+
+```bash
+docker run --rm  --name postgres-db --network=postgres-net -e POSTGRES_PASSWORD=your_password -e POSTGRES_USER=your_username -e POSTGRES_DB=your_database_name -p 5432:5432 -d postgres:latest 
+```
+
 Replace your_password, your_username, and your_database_name with your desired values.
 
 This command will start a PostgreSQL container with the specified environment variables and expose port 5432 on your local machine.
@@ -12,8 +24,14 @@ This command will start a PostgreSQL container with the specified environment va
 To run pgAdmin using Docker, execute the following command:
 
 ```bash
-docker run --name pgadmin -e PGADMIN_DEFAULT_EMAIL=your_email@example.com -e PGADMIN_DEFAULT_PASSWORD=your_password -p 8080:80 -d dpage/pgadmin4
+docker run --name pgadmin  --network=postgres-net -e PGADMIN_DEFAULT_EMAIL=your_email@example.com -e PGADMIN_DEFAULT_PASSWORD=your_password -p 8080:80 -d dpage/pgadmin4
 ```
+
+or (deleting after stop)
+```bash
+docker run --rm --name pgadmin --network=postgres-net -e PGADMIN_DEFAULT_EMAIL=your_email@example.com -e PGADMIN_DEFAULT_PASSWORD=your_password -p 8080:80 -d dpage/pgadmin4
+```
+
 Replace your_email@example.com and your_password with your desired values.
 
 This command will start a pgAdmin container and expose port 8080 on your local machine.
