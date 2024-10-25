@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    # container_name: prometheus
+    network_mode: "host" # with this option, prometheus will be able to scrape the containers
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml  # remenber, you must provide the prometheus config
+      - prometheus_data:/prometheus                     # here, we are storing the prometheus data
+    ports:
+      - "9090:9090"
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"   # with this option, we are telling prometheus to use the prometheus.yml file
+      - "--storage.tsdb.path=/prometheus"               # here, we are telling prometheus to use the volume we created
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries' # here, we are telling prometheus to use the console_libraries
+      - '--web.console.templates=/usr/share/prometheus/consoles'          # here, we are telling prometheus to use the consoles
+
+  # if you want to monitor docker
+#   cadvisor: # problem with arch or if you was having cgroups v2, cadvisor will not work
+#     image: google/cadvisor:latest
+#     container_name: cadvisor
+#     volumes:
+#       - /:/rootfs:ro
+#       - /var/run:/var/run:ro
+#       - /sys:/sys:ro
+#       - /var/lib/docker/:/var/lib/docker:ro
+#       # - /dev/disk/:/dev/disk:ro
+#     ports:
+#       - "8080:8080" 
+
+
+  node_exporter: # use docker experimental metrics bc prometheus does not support cgroups v2
+    image: prom/node-exporter:latest
+    # container_name: node_exporter
+    ports:
+      - "9100:9100"  
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+
+
+
+volumes:
+  prometheus_data:
